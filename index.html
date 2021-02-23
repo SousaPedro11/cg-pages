@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+    <meta name="GENERATOR" content="Microsoft FrontPage 4.0" />
+    <meta name="ProgId" content="FrontPage.Editor.Document" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css">
+
+    <title>Home</title>
+  </head>
+  <body>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="bresham-tab" data-bs-toggle="tab" data-bs-target="#bresham" type="button" role="tab" aria-controls="bresham" aria-selected="true">Bresehan</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="circle-tab" data-bs-toggle="tab" data-bs-target="#circle" type="button" role="tab" aria-controls="circle" aria-selected="false">Circle</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="curve-tab" data-bs-toggle="tab" data-bs-target="#curve" type="button" role="tab" aria-controls="curve" aria-selected="false">Curve</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="polyline-tab" data-bs-toggle="tab" data-bs-target="#polyline" type="button" role="tab" aria-controls="polyline" aria-selected="false">Polyline</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="preenchimento-tab" data-bs-toggle="tab" data-bs-target="#preenchimento" type="button" role="tab" aria-controls="preenchimento" aria-selected="false">Preenchimento</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="scanline-tab" data-bs-toggle="tab" data-bs-target="#scanline" type="button" role="tab" aria-controls="scanline" aria-selected="false">Scanline</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="recorte-tab" data-bs-toggle="tab" data-bs-target="#recorte" type="button" role="tab" aria-controls="recorte" aria-selected="false">recorte</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="transformacoes-tab" data-bs-toggle="tab" data-bs-target="#transformacoes" type="button" role="tab" aria-controls="transformacoes" aria-selected="false">transformacoes</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="projecoes-tab" data-bs-toggle="tab" data-bs-target="#projecoes" type="button" role="tab" aria-controls="projecoes" aria-selected="false">projecoes</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="perspectiva-tab" data-bs-toggle="tab" data-bs-target="#perspectiva" type="button" role="tab" aria-controls="perspectiva" aria-selected="false">perspectiva</button>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="bresham" role="tabpanel" aria-labelledby="bresham-tab">
+            <object class="objeto" data="bresehan.html" width="1000" height="900"></object>
+        </div>
+        <div class="tab-pane" id="circle" role="tabpanel" aria-labelledby="circle-tab">
+            <object class="objeto" data="circulos.html" width="1000" height="900"></object>
+        </div>
+        <div class="tab-pane" id="curve" role="tabpanel" aria-labelledby="curve-tab">
+            <object class="objeto" data="curva.html" width="1000" height="900"></object>
+        </div>
+        <div class="tab-pane" id="polyline" role="tabpanel" aria-labelledby="polyline-tab">
+            <object class="objeto" data="polyline.html" width="1000" height="900"></object>
+        </div>
+        <div class="tab-pane" id="preenchimento" role="tabpanel" aria-labelledby="preenchimento-tab">
+            <object class="objeto" data="preenchimento.html" width="1000" height="900"></object>
+        </div>
+        <div class="tab-pane" id="scanline" role="tabpanel" aria-labelledby="scanline-tab">
+            <object class="objeto" data="scanline.html" width="1000" height="900"></object>
+        </div>
+        <div class="tab-pane" id="recorte" role="tabpanel" aria-labelledby="recorte-tab">
+            <object class="objeto" data="recorte.html" width="1000" height="900"></object>
+        </div>
+        <div class="tab-pane" id="transformacoes" role="tabpanel" aria-labelledby="transformacoes-tab">
+            <object class="objeto" data="transformacoes.html" width="1000" height="900"></object>
+        </div>
+        <div class="tab-pane" id="projecoes" role="tabpanel" aria-labelledby="projecoes-tab">
+            <object class="objeto" data="projecoes.html" width="1000" height="900"></object>
+        </div>
+        <div class="tab-pane" id="perspectiva" role="tabpanel" aria-labelledby="perspectiva-tab">
+            <object class="objeto" data="perspectiva.html" width="1000" height="900"></object>
+        </div>
+      </div>
+
+      <script>
+        var firstTabEl = document.querySelector('#myTab li:last-child a')
+        var firstTab = new bootstrap.Tab(firstTabEl)
+
+        firstTab.show()
+      </script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

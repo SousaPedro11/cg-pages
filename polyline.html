@@ -1,0 +1,376 @@
+<script src="modernizr.js"></script>
+<link rel="stylesheet" href="style.css" />
+<script language="javascript">
+  var fb;
+
+  function canvasSupport() {
+    return Modernizr.canvas;
+  }
+
+  function canvasApp() {
+    if (!canvasSupport()) {
+      alert('No canvas support!');
+      return;
+    }
+
+    fb = new FatBits('canvasOne');
+    fb.clear();
+  }
+
+  // ==================== FatBits Class ==============================================
+  function FatBits(canvasID) {
+    this.theCanvas = document.getElementById(canvasID);
+    if (!this.theCanvas) {
+      alert('Cannot find the canvas with ID=' + canvasID);
+      return;
+    }
+    this.context = this.theCanvas.getContext('2d');
+
+    this.BitOffColor = '#ccffff'; // blue
+    this.BitOnColor = '#000000'; // black
+    this.BitBetweenColor = '#66ff66'; // green
+
+    this.BitSize = 0; // witdth of bit
+    this.BitAlley = 0; // width of alley between bits
+
+    // ==================== Methods ========================
+
+    // -------------- clear() -----------------------
+    this.clear = function () {
+      this.context.fillStyle = this.BitBetweenColor;
+      this.context.fillRect(
+        0,
+        0,
+        this.theCanvas.width - 1,
+        this.theCanvas.height - 1
+      );
+      for (var row = 0; row <= this.Max_x; ++row) {
+        for (var col = 0; col <= this.Max_y; ++col) {
+          this.paintBit(row, col, false);
+        }
+      }
+      //this.border("#000000",1);
+    };
+
+    // ----------------- border(color) -------------------------
+    this.border = function (color, width) {
+      this.context.lineWidth = width;
+      this.context.strokeStyle = color;
+      this.context.strokeRect(
+        1,
+        1,
+        this.theCanvas.width - 1,
+        this.theCanvas.height - 1
+      );
+    };
+
+    // ------------------- setBitSize(width,alley) -------------------
+    this.setBitSize = function (width, alley) {
+      this.BitSize = width;
+      this.BitAlley = alley;
+      var half = Math.floor(width / 2);
+      this.Max_x = Math.ceil(
+        (this.theCanvas.width - half - alley) / (width + alley)
+      );
+      this.Max_y = Math.ceil(
+        (this.theCanvas.height - half - alley) / (width + alley)
+      );
+    };
+
+    // --------------- paintBit(x,y,on_off) ---------------------------
+    this.paintBit = function (x, y, on_off) {
+      var xcenter = x * (this.BitSize + this.BitAlley);
+      var half = Math.floor(this.BitSize / 2);
+      var ycenter = y * (this.BitSize + this.BitAlley);
+      this.context.fillStyle = on_off ? this.BitOnColor : this.BitOffColor;
+      this.context.fillRect(
+        xcenter - half,
+        ycenter - half,
+        this.BitSize,
+        this.BitSize
+      );
+    };
+
+    // ---------------------- drawLine(x1,y1,x2,y2,color) ------------------
+    this.drawLine = function (x1, y1, x2, y2, color) {
+      this.context.strokeStyle = color;
+      this.context.lineWidth = 1;
+      this.context.beginPath();
+      var block = this.BitSize + this.BitAlley;
+      this.context.moveTo(x1 * block, y1 * block);
+      this.context.lineTo(x2 * block, y2 * block);
+      this.context.stroke();
+      this.context.closePath();
+    };
+
+    // ========================== Methods (end) ============================
+
+    this.setBitSize(31, 2);
+  }
+
+  // ============================== FatBits (end) ========================
+
+  // ============================== Drawing Bits ============================
+  var isDrawing = false; //
+  var overLine = null; // line to draw over the bits, e.g. {x1:1, y1:2, x2:4, y2:5, color:"red"}
+  var drawingDelay = 0; // seconds between each bit displayed
+  var drawingBits = []; // list of point coords to draw, e.g. [ {x:1,y:2}, {x:1,y:3}, {x:2,y:3} ]
+  var drawingNext = 0; // index of next bit to draw
+
+  function startDrawing(bitList, isDrawingLine) {
+    if (bitList == null || bitList.length == 0) return;
+
+    if (isDrawingLine) {
+      var first = bitList[0];
+      var last = bitList[bitList.length - 1];
+      overLine = {
+        x1: first.x,
+        y1: first.y,
+        x2: last.x,
+        y2: last.y,
+        color: 'red',
+      };
+    } else overLine = null;
+
+    // calc seconds delay between bit drawing
+    var secs = document.getElementById('seconds');
+    var nsecs = parseInt(secs.options[secs.selectedIndex].value);
+    drawingDelay = Math.floor((nsecs * 1000) / (bitList.length - 2));
+
+    drawingBits = bitList;
+    drawingNext = 0;
+    isDrawing = true;
+
+    bitDrawing();
+  }
+
+  function bitDrawing() {
+    if (!isDrawing || drawingNext >= drawingBits.length - 1) return;
+    var point = drawingBits[drawingNext];
+    fb.paintBit(point.x, point.y, true);
+    if (overLine)
+      fb.drawLine(
+        overLine.x1,
+        overLine.y1,
+        overLine.x2,
+        overLine.y2,
+        overLine.color
+      );
+    drawingNext += 1;
+    if (drawingNext < drawingBits.length - 1) {
+      setTimeout(bitDrawing, drawingDelay);
+    } else {
+      isDrawing = false;
+    }
+  }
+
+  // ============================ Drawing Bits (end) ===============================
+
+  // ============================ Mouse Control ===============================
+  var bit1 = null;
+  var bit2 = null;
+
+  function test() {
+    fb.clear();
+    var theBits = [
+      { x: 1, y: 2 },
+      { x: 2, y: 2 },
+      { x: 2, y: 3 },
+      { x: 3, y: 3 },
+      { x: 4, y: 3 },
+      { x: 4, y: 4 },
+      { x: 5, y: 4 },
+    ];
+    fb.paintBit(
+      theBits[theBits.length - 1].x,
+      theBits[theBits.length - 1].y,
+      true
+    );
+    startDrawing(theBits, true);
+  }
+
+  function redraw() {
+    var sel = document.getElementById('npixels');
+    var npixels = parseInt(sel.options[sel.selectedIndex].value);
+    fb.setBitSize(npixels, 1);
+    fb.clear();
+    bit1 = null;
+    bit2 = null;
+  }
+
+  function mouseClick(event) {
+    var xy = bitCoords(event);
+    isDrawing = false;
+    /*if (bit1 == null && bit2 == null) {
+      // abort previous drawing, start anew
+      //fb.clear();
+      fb.paintBit(xy.x, xy.y, true);
+      bit1 = xy;
+    } else if (bit2) {
+      bit1 = bit2.val();
+      bit2 = null;
+    } else {
+      if (xy.x != bit1.x || xy.y != bit1.y) {
+        bit2 = xy;
+        fb.paintBit(xy.x, xy.y, true);
+        fb.drawLine(bit1.x, bit1.y, bit2.x, bit2.y, 'red');
+        drawingBits = Bresenham(bit1, bit2);
+        startDrawing(drawingBits, true);
+      }
+    }*/
+    if (bit1 == null && bit2 == null) {
+      // abort previous drawing, start anew
+      //fb.clear();
+      fb.paintBit(xy.x, xy.y, true);
+      bit1 = xy;
+    } else {
+      if (bit2 == null) {
+        bit2 = xy;
+        fb.paintBit(xy.x, xy.y, true);
+        fb.drawLine(bit1.x, bit1.y, bit2.x, bit2.y, 'red');
+        drawingBits = Bresenham(bit1, bit2);
+        startDrawing(drawingBits, true);
+        console.log(bit1, bit2);
+      } else {
+        bit1 = bit2;
+        bit2 = null;
+        bit2 = xy;
+        fb.paintBit(xy.x, xy.y, true);
+        fb.drawLine(bit1.x, bit1.y, bit2.x, bit2.y, 'red');
+        drawingBits = Bresenham(bit1, bit2);
+        startDrawing(drawingBits, true);
+        console.log(bit1, bit2);
+      }
+    }
+  }
+
+  function bitCoords(event) {
+    var bitx, bity;
+    var xy = relMouseCoords(event);
+    var block = fb.BitSize + fb.BitAlley;
+    var origin = Math.floor(fb.BitSize / 2) + fb.BitAlley;
+    if (xy.x < origin) bitx = 0;
+    else bitx = Math.floor((xy.x - origin) / block) + 1;
+    if (xy.y < origin) bity = 0;
+    else bity = Math.floor((xy.y - origin) / block) + 1;
+    return { x: bitx, y: bity };
+  }
+
+  function relMouseCoords(event) {
+    var totalOffsetX = 0;
+    var totalOffsetY = 0;
+    var canvasX = 0;
+    var canvasY = 0;
+    var currentElement = fb.theCanvas;
+
+    do {
+      totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+      totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+    } while ((currentElement = currentElement.offsetParent));
+
+    canvasX = event.pageX - totalOffsetX;
+    canvasY = event.pageY - totalOffsetY;
+    return { x: canvasX, y: canvasY };
+  }
+
+  function Bresenham(point1, point2) {
+    var list = new Array();
+    var x0 = point1.x;
+    var y0 = point1.y;
+    var x1 = point2.x;
+    var y1 = point2.y;
+    var steep = Math.abs(y1 - y0) > Math.abs(x1 - x0);
+    if (steep) {
+      var temp;
+      temp = y0;
+      y0 = x0;
+      x0 = temp;
+      temp = y1;
+      y1 = x1;
+      x1 = temp;
+    }
+    var deltax = Math.abs(x1 - x0);
+    var deltay = Math.abs(y1 - y0);
+    if (deltax <= 1) {
+      if (steep) {
+        list.push({ x: point1.y, y: point1.x });
+        list.push({ x: point2.y, y: point2.x });
+      } else {
+        list.push(point1);
+        list.push(point2);
+      }
+      return list;
+    }
+    var currentx = x0;
+    var currenty = y0;
+    var xinc = x0 < x1 ? 1 : -1;
+    var error = 0;
+    var yinc = (y1 - y0) / deltax;
+
+    while (currentx != x1) {
+      if (steep) list.push({ x: currenty, y: currentx });
+      else list.push({ x: currentx, y: currenty });
+      currentx += xinc;
+      error += yinc;
+      if (error > 0.5) {
+        currenty += 1;
+        error -= 1;
+      } else if (error < -0.5) {
+        currenty -= 1;
+        error += 1;
+      }
+    }
+    if (steep) list.push({ x: y1, y: x1 });
+    else list.push({ x: x1, y: y1 });
+    return list;
+  }
+</script>
+
+<body onLoad="canvasApp();">
+  <table border="1" class="conteudo">
+    <tr>
+      <td>
+        <canvas
+          id="canvasOne"
+          width="900"
+          height="500"
+          onmousedown="mouseClick(event);"
+        >
+          Your browser does not support the HTML5 canvas
+        </canvas>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p align="center">
+          Pixels/square:
+          <select size="1" name="npixels" id="npixels" onchange="redraw();">
+            <option>5</option>
+            <option>15</option>
+            <option selected>30</option>
+            <option>45</option>
+          </select>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <!--<input type="button" value="Redraw area" name="fred" onClick="redraw();">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+          Time to draw:
+          <select size="1" name="seconds" id="seconds">
+            <option selected>1</option>
+            <option>2</option>
+            <option>5</option>
+            <option>10</option>
+            &nbsp;
+          </select>
+          seconds
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p align="center">
+          Use the mouse to click on two squares.<br />A line will be drawn
+          between them using the Bresenham algorithm.
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
